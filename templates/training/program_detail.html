@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+  .training-hero {
+    background: linear-gradient(135deg, #f7f1ff 0%, #e9f7f1 100%);
+    border: 1px solid #e7ddff;
+  }
+  .training-stat {
+    background: #ffffff;
+    border: 1px solid #efe6ff;
+  }
+  .training-title {
+    color: #2f1d15;
+  }
+</style>
+<div class="card brand-card shadow-sm border-0 mb-4">
+  <div class="card-body d-flex flex-wrap align-items-center justify-content-between gap-3 training-hero">
+    <div>
+      <h1 class="mb-1 training-title">{{ program.title }}</h1>
+      <p class="text-muted mb-0">{{ program.objective }}</p>
+    </div>
+    <div class="text-end">
+      <div class="small text-muted">Progression</div>
+      <div class="fw-semibold">{{ progress_percent }}%</div>
+      <div class="progress mt-2" style="height: 8px;">
+        <div class="progress-bar" role="progressbar" style="width: {{ progress_percent }}%"></div>
+      </div>
+      <div class="d-flex flex-column gap-2 mt-3">
+        <a class="btn btn-sm btn-secondary-premium" href="/formation/programme/{{ program.id }}/plan.pdf">Télécharger le plan PDF</a>
+        <a class="btn btn-sm btn-secondary-premium" href="/formation/reporting/">Reporting formation</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card brand-card mb-4 shadow-sm border-0">
+  <div class="card-body">
+    <div class="d-flex flex-wrap gap-2">
+      <span class="badge badge-status badge-status--purple">{{ enrollment.get_status_display }}</span>
+    </div>
+    <div class="progress mt-3" style="height: 10px;">
+      <div class="progress-bar" role="progressbar" style="width: {{ progress_percent }}%"></div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card training-stat shadow-sm border-0">
+      <div class="card-body">
+        <div class="small text-muted text-uppercase">Modules</div>
+        <div class="fw-semibold">{{ total_lessons }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card training-stat shadow-sm border-0">
+      <div class="card-body">
+        <div class="small text-muted text-uppercase">Validés</div>
+        <div class="fw-semibold text-success">{{ completed_lessons }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card training-stat shadow-sm border-0">
+      <div class="card-body">
+        <div class="small text-muted text-uppercase">Restants</div>
+        <div class="fw-semibold text-warning">{{ remaining_lessons }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card training-stat shadow-sm border-0">
+      <div class="card-body">
+        <div class="small text-muted text-uppercase">Quiz validés</div>
+        <div class="fw-semibold text-primary">{{ quiz_passed_count }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    {% for week in program.weeks.all %}
+    <div class="card brand-card mb-3 shadow-sm border-0">
+      <div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+          <div>
+            <h5 class="mb-1">Semaine {{ week.week_number }} - {{ week.title }}</h5>
+            <p class="text-muted mb-0">{{ week.objective }}</p>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge badge-status badge-status--purple">{{ week.lessons.all|length }} modules</span>
+            <button class="btn btn-sm btn-secondary-premium" type="button" data-bs-toggle="collapse" data-bs-target="#week-{{ week.id }}">
+              Voir modules
+            </button>
+          </div>
+        </div>
+        <div id="week-{{ week.id }}" class="collapse {% if forloop.first %}show{% endif %}">
+          <ul class="list-group list-group-flush mt-3">
+            {% for lesson in week.lessons.all %}
+            <li class="list-group-item">
+              <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                <div>
+                  <h6 class="mb-1">{{ lesson.title }}</h6>
+                  <p class="small text-muted mb-2">{{ lesson.objective }}</p>
+                  <div class="d-flex flex-wrap gap-2">
+                    <span class="badge badge-status badge-status--progress">{{ lesson.get_lesson_type_display }}</span>
+                    {% if lesson.checklist_total %}
+                    <span class="badge badge-status badge-status--purple">
+                      Checklist {{ lesson.checklist_done }}/{{ lesson.checklist_total }}
+                    </span>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="d-flex flex-column gap-2">
+                  <a class="btn btn-sm btn-secondary-premium" href="/formation/module/{{ lesson.id }}/">Voir le module</a>
+                  {% if lesson.is_completed %}
+                  <span class="badge badge-status badge-status--done">Module validé</span>
+                  {% else %}
+                  <form method="post" action="/formation/module/{{ lesson.id }}/terminer/">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-save" type="submit">Marquer terminé</button>
+                  </form>
+                  {% endif %}
+                </div>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="col-lg-4">
+    <div class="card brand-card mb-4 shadow-sm border-0">
+      <div class="card-body">
+        <h5 class="card-title">Évaluation finale</h5>
+        {% if evaluation %}
+        <p class="mb-1">Score : <strong>{{ evaluation.score }}/100</strong></p>
+        <p class="mb-2 text-muted">{{ evaluation.comments|default:"Aucun commentaire." }}</p>
+        <span class="badge badge-status {% if evaluation.is_passed %}badge-status--done{% else %}badge-status--warn{% endif %}">
+          {% if evaluation.is_passed %}Validée{% else %}À renforcer{% endif %}
+        </span>
+        {% else %}
+        <p class="text-muted">Évaluation finale non saisie.</p>
+        {% endif %}
+        <a class="btn btn-secondary-premium btn-sm mt-3" href="/formation/programme/{{ program.id }}/evaluation/">Accéder à l'évaluation</a>
+      </div>
+    </div>
+    <div class="card brand-card mb-4 shadow-sm border-0">
+      <div class="card-body">
+        <h5 class="card-title">Mini glossaire</h5>
+        {% if mini_glossary %}
+        <div class="d-flex flex-column gap-3">
+          {% for card in mini_glossary %}
+          <div class="border rounded p-3">
+            <div class="fw-semibold">{{ card.term }}</div>
+            <div class="small text-muted mt-2">{{ card.rendered_definition|safe }}</div>
+            {% if card.rendered_example %}
+            <div class="small mt-2">
+              <span class="fw-semibold">Exemple Floxy Made :</span>
+              <div class="text-muted">{{ card.rendered_example|safe }}</div>
+            </div>
+            {% endif %}
+            <div class="small text-muted mt-2">Module : {{ card.lesson.title }}</div>
+          </div>
+          {% endfor %}
+        </div>
+        {% if has_more_glossary %}
+        <div class="small text-muted mt-2">
+          Pour voir tous les termes, consultez le <a href="/formation/glossaire/">glossaire complet</a>.
+        </div>
+        {% endif %}
+        {% else %}
+        <p class="text-muted">Aucun terme disponible pour le moment.</p>
+        {% endif %}
+      </div>
+    </div>
+    <div class="card brand-card shadow-sm border-0">
+      <div class="card-body">
+        <h5 class="card-title">Plan d'actions 90 jours</h5>
+        <p class="text-muted small">Transformez les acquis en actions mesurables.</p>
+        <form method="post" class="compact-form mb-3">
+          {% csrf_token %}
+          {{ action_form.as_p }}
+          <button class="btn btn-save btn-sm" type="submit" name="create_action_plan">Ajouter</button>
+        </form>
+        <div class="d-flex flex-column gap-3">
+          {% for plan in action_plans %}
+          <div class="border rounded p-3">
+            <div class="fw-semibold">{{ plan.title }}</div>
+            <div class="small text-muted">{{ plan.description|default:"Action prioritaire." }}</div>
+            <div class="small">Échéance : {{ plan.due_date|date:"d/m/Y"|default:"Non définie" }}</div>
+            <form method="post" class="d-flex gap-2 align-items-center mt-2">
+              {% csrf_token %}
+              <input type="hidden" name="action_plan_id" value="{{ plan.id }}" />
+              <select name="status" class="form-select form-select-sm">
+                {% for value, label in action_status_choices %}
+                <option value="{{ value }}" {% if plan.status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+              <button class="btn btn-secondary-premium btn-sm" type="submit" name="update_action_plan">Mettre à jour</button>
+            </form>
+          </div>
+          {% empty %}
+          <div class="text-muted">Aucun plan d'action enregistré.</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+  <div>
+    <h1 class="mb-1">Prestations & POS</h1>
+    <p class="text-muted mb-0">Catégories de services et enregistrement caisse.</p>
+  </div>
+  <div class="d-flex gap-3">
+    <div class="text-end">
+      <div class="small text-muted">CA attendu aujourd'hui</div>
+      <div class="fw-semibold">{{ expected_total }}</div>
+    </div>
+    <div class="text-end">
+      <div class="small text-muted">CA encaissé</div>
+      <div class="fw-semibold">{{ paid_total }}</div>
+    </div>
+  </div>
+</div>
+
+{% if can_manage %}
+<div class="accordion mb-4" id="posAccordion">
+  <div class="accordion-item brand-card form-card">
+    <h2 class="accordion-header">
+      <button
+        class="accordion-button {% if not open_form %}collapsed{% endif %}"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#posCollapse"
+      >
+        Enregistrer une prestation (POS)
+      </button>
+    </h2>
+    <div
+      id="posCollapse"
+      class="accordion-collapse collapse {% if open_form %}show{% endif %}"
+      data-bs-parent="#posAccordion"
+    >
+      <div class="accordion-body">
+        <form method="post" class="compact-form">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Type d'activité</label>
+              {{ form.type }}
+              {% for error in form.type.errors %}
+              <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Cliente existante</label>
+              <div class="input-group">
+                {{ form.client_existing }}
+                <button
+                  class="btn btn-secondary-premium"
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#newClientModal"
+                >
+                  Nouvelle
+                </button>
+              </div>
+              {% for error in form.client_existing.errors %}
+              <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Collaborateur</label>
+              {{ form.assigned_staff }}
+              {% for error in form.assigned_staff.errors %}
+              <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+            {{ form.client_name.as_hidden }}
+            {{ form.client_phone.as_hidden }}
+            <div class="col-md-4">
+              <label class="form-label">Quantité (par prestation)</label>
+              {{ form.quantity }}
+              {% for error in form.quantity.errors %}
+              <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Prix unitaire (optionnel)</label>
+              {{ form.unit_price }}
+              {% for error in form.unit_price.errors %}
+              <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Montant (achat/produit)</label>
+              {{ form.expected_amount }}
+              {% for error in form.expected_amount.errors %}
+              <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+              <div class="form-check">
+                {{ form.content_possible }}
+                <label class="form-check-label">Contenu possible</label>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Prestations (sélection multiple)</label>
+              {{ form.services }}
+              {% for error in form.services.errors %}
+              <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+              <div class="form-text">Maintenez Ctrl/Cmd pour sélectionner plusieurs prestations.</div>
+              <div class="d-flex flex-wrap gap-2 mt-2">
+                {% for prestation in prestations %}
+                <span class="badge badge-status badge-status--info">{{ prestation.category.name }}</span>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Notes / Référence</label>
+              {{ form.notes }}
+              {% for error in form.notes.errors %}
+              <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="d-flex justify-content-end mt-3">
+            <button class="btn btn-save" type="submit" name="create_activity">Enregistrer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="alert alert-info">Accès POS réservé aux managers.</div>
+{% endif %}
+
+<div class="card brand-card mb-4">
+  <div class="card-body">
+    <h5 class="card-title">Catalogue des prestations</h5>
+    <div class="row g-3">
+      {% for prestation in prestations %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+          {% if prestation.image %}
+          <img class="card-img-top" src="{% static prestation.image %}" alt="{{ prestation.category.name }}" style="height: 90px; object-fit: cover;" />
+        {% else %}
+          <div class="bg-light d-flex align-items-center justify-content-center" style="height: 90px;">
+            <span class="text-muted">{{ prestation.category.name }}</span>
+          </div>
+        {% endif %}
+          <div class="card-body">
+            <h6 class="card-title">{{ prestation.category.name }}</h6>
+            <ul class="list-unstyled mb-3">
+              {% for service in prestation.services %}
+              <li class="d-flex justify-content-between align-items-center">
+                <span>{{ service.name }}</span>
+                <span class="text-muted">{{ service.base_price }}</span>
+              </li>
+              {% endfor %}
+            </ul>
+            {% if can_manage %}
+            <div class="d-flex flex-wrap gap-2">
+              {% for service in prestation.services %}
+              <a class="btn btn-sm btn-secondary-premium" href="/prestations/?service={{ service.id }}">Ajouter {{ service.name }}</a>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="text-muted">Aucune prestation référencée.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="card brand-card">
+  <div class="card-body">
+    <h5 class="card-title">Encaissements récents</h5>
+    <div class="table-responsive">
+      <table class="table table-striped mb-0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Prestation</th>
+            <th>Client</th>
+            <th>Statut</th>
+            <th>Montant</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for activity in activities_today %}
+          <tr>
+            <td>{{ activity.id }}</td>
+            <td>{{ activity.primary_service.name|default:"-" }}</td>
+            <td>{{ activity.client|default:"-" }}</td>
+            <td>{{ activity.get_status_display }}</td>
+            <td>{{ activity.expected_amount }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="text-center text-muted">Aucune activité enregistrée.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="newClientModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nouvelle cliente</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Nom de la cliente</label>
+          <input id="modal-client-name" type="text" class="form-control" placeholder="Nom de la cliente" />
+          {% for error in form.client_name.errors %}
+          <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Téléphone</label>
+          <input id="modal-client-phone" type="text" class="form-control" placeholder="+225..." />
+          {% for error in form.client_phone.errors %}
+          <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="text-muted small">La cliente sera enregistrée lors de la validation.</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary-premium" data-bs-dismiss="modal">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% if form.client_name.errors or form.client_phone.errors %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const modalElement = document.getElementById("newClientModal");
+    if (modalElement && window.bootstrap) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+    }
+  });
+</script>
+{% endif %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const modalName = document.getElementById("modal-client-name");
+    const modalPhone = document.getElementById("modal-client-phone");
+    const hiddenName = document.getElementById("id_client_name");
+    const hiddenPhone = document.getElementById("id_client_phone");
+    const syncInputs = function () {
+      if (hiddenName && modalName) {
+        hiddenName.value = modalName.value;
+      }
+      if (hiddenPhone && modalPhone) {
+        hiddenPhone.value = modalPhone.value;
+      }
+    };
+    if (hiddenName && modalName) {
+      modalName.value = hiddenName.value || "";
+      modalName.addEventListener("input", syncInputs);
+    }
+    if (hiddenPhone && modalPhone) {
+      modalPhone.value = hiddenPhone.value || "";
+      modalPhone.addEventListener("input", syncInputs);
+    }
+    const modalElement = document.getElementById("newClientModal");
+    if (modalElement) {
+      modalElement.addEventListener("hidden.bs.modal", syncInputs);
+    }
+  });
+</script>
+{% endblock %}

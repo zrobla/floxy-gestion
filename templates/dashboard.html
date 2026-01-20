@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Aujourd'hui</h1>
+
+<ul class="nav nav-tabs mb-4" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#resume" type="button">
+      <i class="bi bi-stars"></i> Résumé
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#activites" type="button">
+      <i class="bi bi-activity"></i> Activités
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#taches" type="button">
+      <i class="bi bi-check2-square"></i> Tâches
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#contenus" type="button">
+      <i class="bi bi-calendar-event"></i> Contenus
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#perruques" type="button">
+      <i class="bi bi-scissors"></i> Perruques
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#stock" type="button">
+      <i class="bi bi-box-seam"></i> Stock
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#prestations" type="button">
+      <i class="bi bi-bag-heart"></i> Prestations
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane fade show active" id="resume" role="tabpanel">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card brand-card">
+          <div class="card-body">
+            <h5 class="card-title">Activités</h5>
+            <p class="card-text">{{ activities_today }} activité(s) du jour.</p>
+            <p class="mb-0 text-muted">Encaissements en attente : {{ activities_summary.to_collect }}</p>
+            <div class="sparkline">
+              <span style="height: 10px"></span>
+              <span style="height: 20px"></span>
+              <span style="height: 14px"></span>
+              <span style="height: 24px"></span>
+              <span style="height: 16px"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card brand-card">
+          <div class="card-body">
+            <h5 class="card-title">Tâches</h5>
+            <p class="card-text">{{ tasks_due }} tâche(s) à échéance aujourd'hui.</p>
+            <span class="badge badge-status badge-status--warn">{{ tasks_summary.overdue }} en retard</span>
+            <div class="sparkline">
+              <span style="height: 8px"></span>
+              <span style="height: 12px"></span>
+              <span style="height: 20px"></span>
+              <span style="height: 18px"></span>
+              <span style="height: 14px"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card brand-card">
+          <div class="card-body">
+            <h5 class="card-title">Contenus</h5>
+            <p class="card-text">{{ content_scheduled }} contenu(s) planifié(s) aujourd'hui.</p>
+            <span class="badge badge-status badge-status--purple">{{ content_summary.to_validate }} à valider</span>
+            <div class="sparkline">
+              <span style="height: 12px"></span>
+              <span style="height: 16px"></span>
+              <span style="height: 22px"></span>
+              <span style="height: 14px"></span>
+              <span style="height: 18px"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card brand-card">
+          <div class="card-body">
+            <h5 class="card-title">Chiffre attendu</h5>
+            <p class="card-text">{{ expected_revenue }} FCFA prévus aujourd'hui.</p>
+            <div class="sparkline">
+              <span style="height: 14px"></span>
+              <span style="height: 22px"></span>
+              <span style="height: 18px"></span>
+              <span style="height: 26px"></span>
+              <span style="height: 12px"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card brand-card">
+          <div class="card-body">
+            <h5 class="card-title">Entretien perruques</h5>
+            <p class="card-text">{{ care_wigs_summary.in_progress }} en cours.</p>
+            <span class="badge badge-status badge-status--done">{{ care_wigs_summary.ready }} prêtes</span>
+            <div class="sparkline">
+              <span style="height: 10px"></span>
+              <span style="height: 18px"></span>
+              <span style="height: 14px"></span>
+              <span style="height: 20px"></span>
+              <span style="height: 12px"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card brand-card">
+          <div class="card-body">
+            <h5 class="card-title">Stock</h5>
+            <p class="card-text">{{ stock_alerts }} article(s) en alerte.</p>
+            <div class="sparkline">
+              <span style="height: 8px"></span>
+              <span style="height: 16px"></span>
+              <span style="height: 20px"></span>
+              <span style="height: 12px"></span>
+              <span style="height: 18px"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane fade" id="activites" role="tabpanel">
+    <div class="card brand-card">
+      <div class="card-body">
+        <h5 class="card-title">Activités récentes</h5>
+        <div class="table-responsive">
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Client</th>
+                <th>Statut</th>
+                <th>Montant</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for activity in activities_recent %}
+              <tr>
+                <td>{{ activity.id }}</td>
+                <td>{{ activity.client|default:"-" }}</td>
+                <td><span class="badge badge-status bg-secondary">{{ activity.get_status_display }}</span></td>
+                <td>{{ activity.expected_amount }}</td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="4" class="text-center">Aucune activité.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane fade" id="taches" role="tabpanel">
+    <div class="card brand-card">
+      <div class="card-body">
+        <h5 class="card-title">Tâches en retard</h5>
+        <ul class="list-group list-group-flush">
+          {% for task in tasks_overdue_list %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span>{{ task.title }}</span>
+            <span class="badge badge-status badge-status--warn">Échéance {{ task.due_date|date:"d/m/Y" }}</span>
+          </li>
+          {% empty %}
+          <li class="list-group-item text-muted">Aucune tâche en retard.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane fade" id="contenus" role="tabpanel">
+    <div class="card brand-card">
+      <div class="card-body">
+        <h5 class="card-title">File de validation</h5>
+        <ul class="list-group list-group-flush">
+          {% for item in content_queue %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span>{{ item.title }}</span>
+            <span class="badge badge-status badge-status--purple">{{ item.get_status_display }}</span>
+          </li>
+          {% empty %}
+          <li class="list-group-item text-muted">Aucun contenu en attente.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane fade" id="perruques" role="tabpanel">
+    <div class="card brand-card">
+      <div class="card-body">
+        <h5 class="card-title">Perruques prêtes</h5>
+        <ul class="list-group list-group-flush">
+          {% for item in care_wigs_ready %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span>{{ item.code }} - {{ item.client|default:"-" }}</span>
+            <span class="badge badge-status badge-status--done">{{ item.get_status_display }}</span>
+          </li>
+          {% empty %}
+          <li class="list-group-item text-muted">Aucune perruque prête.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane fade" id="stock" role="tabpanel">
+    <div class="card brand-card">
+      <div class="card-body">
+        <h5 class="card-title">Articles en alerte</h5>
+        <ul class="list-group list-group-flush">
+          {% for stock in stock_alerts_list %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span>{{ stock.item.name }}</span>
+            <span class="badge badge-status badge-status--warn">{{ stock.quantity }}</span>
+          </li>
+          {% empty %}
+          <li class="list-group-item text-muted">Aucune alerte stock.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane fade" id="prestations" role="tabpanel">
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <div class="card brand-card">
+          <div class="card-body">
+            <h5 class="card-title">Mix prestations du jour</h5>
+            <div class="table-responsive">
+              <table class="table table-striped mb-0">
+                <thead>
+                  <tr>
+                    <th>Prestation</th>
+                    <th>Volume</th>
+                    <th>Quantité</th>
+                    <th>CA attendu</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in prestations_today %}
+                  <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.total_lines }}</td>
+                    <td>{{ item.total_qty }}</td>
+                    <td>{{ item.revenue }}</td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="4" class="text-center text-muted">Aucune prestation planifiée.</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="card brand-card mt-4">
+          <div class="card-body">
+            <h5 class="card-title">Mix par catégorie</h5>
+            <div class="table-responsive">
+              <table class="table table-striped mb-0">
+                <thead>
+                  <tr>
+                    <th>Catégorie</th>
+                    <th>Volume</th>
+                    <th>Quantité</th>
+                    <th>CA attendu</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in prestations_categories %}
+                  <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.total_lines }}</td>
+                    <td>{{ item.total_qty }}</td>
+                    <td>{{ item.revenue }}</td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="4" class="text-center text-muted">Aucune prestation planifiée.</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="card brand-card">
+          <div class="card-body">
+            <h5 class="card-title">Planning prestations</h5>
+            <div class="table-responsive">
+              <table class="table table-striped mb-0">
+                <thead>
+                  <tr>
+                    <th>Service</th>
+                    <th>Client</th>
+                    <th>Staff</th>
+                    <th>Statut</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for line in prestations_schedule %}
+                  <tr>
+                    <td>{{ line.service.name }}</td>
+                    <td>{{ line.activity.client|default:"-" }}</td>
+                    <td>{{ line.activity.assigned_staff|default:"-" }}</td>
+                    <td>{{ line.activity.get_status_display }}</td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="4" class="text-center text-muted">Aucune prestation planifiée.</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

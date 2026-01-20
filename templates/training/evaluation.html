@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+  <div>
+    <h1>Évaluation finale</h1>
+    <p class="text-muted">Validez les compétences acquises durant la formation.</p>
+  </div>
+  <div class="text-end">
+    <div class="small text-muted">Progression globale</div>
+    <div class="fw-semibold">{{ progress_percent }}%</div>
+  </div>
+</div>
+
+<div class="card brand-card">
+  <div class="card-body">
+    {% if evaluation %}
+    <div class="alert alert-info">
+      Dernière évaluation : {{ evaluation.score }}/100 - {{ evaluation.evaluated_at|date:"d/m/Y" }}
+    </div>
+    {% endif %}
+    <form method="post" class="compact-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn btn-save" type="submit">Enregistrer</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

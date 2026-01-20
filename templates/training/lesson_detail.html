@@ -1,0 +1,484 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+  .training-sticky-nav {
+    position: sticky;
+    top: 16px;
+  }
+  .training-section-card {
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .training-section-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(16, 24, 40, 0.08);
+  }
+  .training-section-card .card-header {
+    background: linear-gradient(135deg, #fff7ec 0%, #f0f6ff 100%);
+    border-bottom: 1px solid #f3e8d8;
+  }
+  .training-section-card .card-title {
+    color: #2f1d15;
+  }
+  .training-focus {
+    opacity: .4;
+    pointer-events: none;
+  }
+  .training-focus.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+</style>
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+  <div>
+    <a class="text-decoration-none" href="/formation/programme/{{ program.id }}/">&larr; Retour au programme</a>
+    <h1 class="mt-2">{{ lesson.title }}</h1>
+    <p class="text-muted">{{ lesson.objective }}</p>
+  </div>
+  <div class="d-flex flex-column align-items-end">
+    <div class="badge badge-status badge-status--progress">{{ lesson.get_lesson_type_display }}</div>
+    <div class="small text-muted">{{ lesson.duration_minutes }} min</div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-lg-3">
+    <div class="training-sticky-nav">
+      <div class="card brand-card shadow-sm border-0">
+        <div class="card-body">
+          <div class="fw-semibold mb-2">Navigation</div>
+          <div class="d-flex flex-column gap-2">
+            {% for item in sections %}
+            <a class="btn btn-sm btn-secondary-premium text-start" href="#{{ item.id }}">{{ item.label }}</a>
+            {% endfor %}
+          </div>
+          <div class="mt-3">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="focusModeToggle">
+              <label class="form-check-label small" for="focusModeToggle">Mode focus</label>
+            </div>
+            <div class="small text-muted mt-1">Affiche une section à la fois.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-9">
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="card brand-card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="text-uppercase small text-muted">Type</div>
+            <div class="fw-semibold">{{ lesson.get_lesson_type_display }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card brand-card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="text-uppercase small text-muted">Durée</div>
+            <div class="fw-semibold">{{ lesson.duration_minutes }} min</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card brand-card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="text-uppercase small text-muted">Mode</div>
+            <div class="fw-semibold">{{ completion_status.mode_label }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card brand-card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="text-uppercase small text-muted">Score requis</div>
+            <div class="fw-semibold">{{ lesson.passing_score }}%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<div class="card brand-card mb-4 shadow-sm border-0 training-section-card training-section" id="lessonContent">
+  <div class="card-header bg-transparent d-flex align-items-center justify-content-between">
+    <h5 class="card-title mb-0">Contenu du module</h5>
+    <button class="btn btn-sm btn-secondary-premium" type="button" data-bs-toggle="collapse" data-bs-target="#lessonContentBody">
+      Voir
+    </button>
+  </div>
+  <div id="lessonContentBody" class="collapse show" data-section-body>
+    <div class="card-body">
+      <p>{{ lesson.description|default:"" }}</p>
+      {% if lesson.key_points %}
+      <h6 class="mt-4">Points clés</h6>
+      <p class="text-muted">{{ lesson.key_points|linebreaksbr }}</p>
+      {% endif %}
+      {% if lesson.deliverables %}
+      <h6 class="mt-4">Livrables</h6>
+      <p class="text-muted">{{ lesson.deliverables|linebreaksbr }}</p>
+      {% endif %}
+      {% if rendered_content %}
+      <div class="text-muted">{{ rendered_content|safe }}</div>
+      {% else %}
+      <p class="text-muted">Aucun contenu détaillé pour le moment.</p>
+      {% endif %}
+      {% if video_url %}
+      <div class="mt-3">
+        <a class="btn btn-secondary-premium" href="{{ video_url }}" target="_blank" rel="noopener">Voir la vidéo</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="card brand-card mb-4 shadow-sm border-0 training-section-card training-section" id="lessonSupports">
+  <div class="card-header bg-transparent d-flex flex-wrap align-items-center justify-content-between gap-2">
+    <h5 class="card-title mb-0">📘 Supports d’étude</h5>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge badge-status badge-status--purple">{{ study_materials|length }} support(s)</span>
+      {% if concept_cards %}
+      <a class="small text-decoration-none" href="#lessonLexique">Voir le lexique</a>
+      {% endif %}
+      <button class="btn btn-sm btn-secondary-premium" type="button" data-bs-toggle="collapse" data-bs-target="#lessonSupportsBody">
+        Voir
+      </button>
+    </div>
+  </div>
+  <div id="lessonSupportsBody" class="collapse show" data-section-body>
+    <div class="card-body">
+      {% if study_materials %}
+      <div class="d-flex flex-column gap-3">
+        {% for material in study_materials %}
+        <div class="border rounded-3 p-3">
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div>
+              <div class="fw-semibold">{{ material.title }}</div>
+              <div class="small text-muted">{{ material.get_support_type_display }}</div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+              {% if material.recommended_before_quiz %}
+              <span class="badge badge-status badge-status--warn">À étudier avant le quiz</span>
+              {% endif %}
+              {% if material.is_mandatory %}
+              <span class="badge badge-status badge-status--progress">Indispensable</span>
+              {% endif %}
+              {% if material.is_viewed %}
+              <span class="badge badge-status badge-status--done">Consulté</span>
+              {% endif %}
+            </div>
+          </div>
+          <div class="mt-3 text-muted">{{ material.rendered_content|safe }}</div>
+          {% if not material.is_viewed %}
+          <form class="mt-3" method="post" action="/formation/module/{{ lesson.id }}/support/{{ material.id }}/viewed/">
+            {% csrf_token %}
+            <button class="btn btn-secondary-premium btn-sm" type="submit">Marquer comme consulté</button>
+          </form>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-muted">Aucun support d’étude n’est disponible pour ce module.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% if concept_cards %}
+<div class="card brand-card mb-4 shadow-sm border-0 training-section-card training-section" id="lessonLexique">
+  <div class="card-header bg-transparent d-flex align-items-center justify-content-between">
+    <h5 class="card-title mb-0">Lexique & cartes de clarification</h5>
+    <button class="btn btn-sm btn-secondary-premium" type="button" data-bs-toggle="collapse" data-bs-target="#lessonLexiqueBody">
+      Voir
+    </button>
+  </div>
+  <div id="lessonLexiqueBody" class="collapse" data-section-body>
+    <div class="card-body">
+      <div class="row g-3">
+        {% for card in concept_cards %}
+        <div class="col-lg-6">
+          <div class="border rounded-3 p-3 h-100">
+            <div class="fw-semibold">{{ card.term }}</div>
+            <div class="small text-muted mt-2">{{ card.rendered_definition|safe }}</div>
+            {% if card.rendered_example %}
+            <div class="small mt-2">
+              <span class="fw-semibold">Exemple Floxy Made :</span>
+              <div class="text-muted">{{ card.rendered_example|safe }}</div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="card brand-card mb-4 shadow-sm border-0 training-section-card training-section" id="lessonStatus">
+  <div class="card-body">
+    <h5 class="card-title">Statut du module</h5>
+    <div class="small text-muted">Mode : {{ completion_status.mode_label }}</div>
+    {% if completion_status.is_eligible %}
+    <div class="alert alert-success mt-3 mb-0">Ce module est éligible à la validation.</div>
+    {% else %}
+    <div class="alert alert-warning mt-3 mb-0">
+      <div class="fw-semibold">Il manque :</div>
+      <ul class="mb-0">
+        {% for item in completion_status.missing %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card brand-card h-100 shadow-sm border-0 training-section-card training-section" id="lessonResources">
+      <div class="card-header bg-transparent d-flex align-items-center justify-content-between">
+        <h5 class="card-title mb-0">Ressources</h5>
+        <button class="btn btn-sm btn-secondary-premium" type="button" data-bs-toggle="collapse" data-bs-target="#lessonResourcesBody">
+          Voir
+        </button>
+      </div>
+      <div id="lessonResourcesBody" class="collapse" data-section-body>
+        <ul class="list-group list-group-flush">
+          {% for resource in lesson.resources.all %}
+          <li class="list-group-item">
+            <div class="fw-semibold">{{ resource.title }}</div>
+            <div class="small text-muted">{{ resource.get_resource_type_display }}</div>
+            {% if resource.rendered_content %}
+            <div class="small">{{ resource.rendered_content|safe }}</div>
+            {% elif resource.description %}
+            <div class="small">{{ resource.description }}</div>
+            {% endif %}
+            {% if resource.url %}
+            <a href="{{ resource.url }}" target="_blank" rel="noopener">Ouvrir la ressource</a>
+            {% endif %}
+          </li>
+          {% empty %}
+          <li class="list-group-item text-muted">Aucune ressource pour ce module.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card brand-card h-100 shadow-sm border-0 training-section-card training-section" id="lessonChecklist">
+      <div class="card-header bg-transparent d-flex align-items-center justify-content-between">
+        <h5 class="card-title mb-0">Checklist de mise en oeuvre</h5>
+        <button class="btn btn-sm btn-secondary-premium" type="button" data-bs-toggle="collapse" data-bs-target="#lessonChecklistBody">
+          Voir
+        </button>
+      </div>
+      <div id="lessonChecklistBody" class="collapse" data-section-body>
+        <div class="card-body">
+          {% if required_remaining %}
+          <div class="alert alert-warning">Certaines actions obligatoires restent à valider.</div>
+          {% endif %}
+          <ul class="list-group list-group-flush">
+          {% for item in lesson.checklist_items.all %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <div class="fw-semibold">{{ item.label }}</div>
+              {% if item.is_required %}
+              <span class="badge badge-status badge-status--warn">Obligatoire</span>
+              {% endif %}
+            </div>
+            <form method="post" action="/formation/module/{{ lesson.id }}/checklist/{{ item.id }}/toggle/">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="training_lesson" />
+              {% if item.is_done %}
+              <button class="btn btn-secondary-premium btn-sm" type="submit">Annuler</button>
+              {% else %}
+              <button class="btn btn-save btn-sm" type="submit">Valider</button>
+              {% endif %}
+            </form>
+          </li>
+          {% empty %}
+          <li class="list-group-item text-muted">Aucune checklist associée.</li>
+          {% endfor %}
+          </ul>
+          <div class="mt-3">
+            {% if progress and progress.completed %}
+            <span class="badge badge-status badge-status--done">Module validé</span>
+            {% else %}
+            <form method="post" action="/formation/module/{{ lesson.id }}/terminer/">
+              {% csrf_token %}
+              <button class="btn btn-save" type="submit" {% if not completion_status.is_eligible %}disabled{% endif %}>
+                Marquer le module terminé
+              </button>
+              {% if not completion_status.is_eligible %}
+              <div class="small text-muted mt-2">
+                {% for item in completion_status.missing %}
+                <span class="badge badge-status badge-status--warn me-1">{{ item }}</span>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if quiz and can_access_quiz %}
+  {% if missing_mandatory_supports %}
+  <div class="alert alert-warning">
+    Avant le quiz, consultez les supports indispensables :
+    <ul class="mb-0">
+      {% for material in missing_mandatory_supports %}
+      <li>{{ material.title }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+<div class="card brand-card mt-4 shadow-sm border-0 training-section-card training-section" id="lessonQuiz">
+  <div class="card-header bg-transparent d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <div class="d-flex align-items-center gap-2">
+      <h5 class="card-title mb-0">Quiz du module</h5>
+      <span class="badge badge-status badge-status--purple">{{ active_questions|length }} questions</span>
+      {% if progress and progress.quiz_passed %}
+      <span class="badge badge-status badge-status--done">Quiz validé</span>
+      {% endif %}
+    </div>
+    <button class="btn btn-sm btn-secondary-premium" type="button" data-bs-toggle="collapse" data-bs-target="#lessonQuizBody">
+      Lancer
+    </button>
+  </div>
+  <div id="lessonQuizBody" class="collapse" data-section-body>
+    <div class="card-body">
+      {% if last_attempt %}
+      <div class="small text-muted mb-2">
+        Dernier score: {{ last_attempt.score_percent|default:"-" }}%
+        {% if best_score %}
+        · Meilleur score: {{ best_score }}%
+        {% endif %}
+      </div>
+      {% elif best_score %}
+      <div class="small text-muted mb-2">Meilleur score: {{ best_score }}%</div>
+      {% endif %}
+
+      <form class="mt-3" method="post" action="/formation/module/{{ lesson.id }}/quiz/">
+      {% csrf_token %}
+      {% for question in active_questions %}
+      <div class="card brand-card mb-3 shadow-sm border-0">
+        <div class="card-body">
+          <div class="d-flex align-items-start justify-content-between gap-2">
+            <div class="fw-semibold">Q{{ forloop.counter }}. {{ question.question_text }}</div>
+            <span class="badge badge-status badge-status--purple">Question {{ forloop.counter }}</span>
+          </div>
+          {% if question.question_type == "OPEN" %}
+          <textarea class="form-control mt-3" name="question_{{ question.id }}" rows="3">{% if question.last_answer %}{{ question.last_answer.answer_text }}{% endif %}</textarea>
+          {% else %}
+          <div class="mt-3">
+            {% for choice in question.choices.all %}
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="choice_{{ choice.id }}" value="{{ choice.id }}"
+                     {% if question.last_answer and question.last_answer.selected_choice_id == choice.id %}checked{% endif %}>
+              <label class="form-check-label" for="choice_{{ choice.id }}">
+                {{ choice.choice_text }}
+              </label>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          {% if last_attempt %}
+          <details class="mt-3">
+            <summary class="small text-muted">Voir correction</summary>
+            <div class="mt-2 small">
+              {% if question.question_type == "OPEN" %}
+              <span class="text-muted">Question ouverte — correction manuelle.</span>
+              {% else %}
+              {% if question.last_answer %}
+                {% if question.last_answer.is_correct %}
+                <span class="text-success">Bonne réponse.</span>
+                {% else %}
+                <span class="text-danger">Réponse incorrecte.</span>
+                {% endif %}
+              {% else %}
+              <span class="text-warning">Non répondu.</span>
+              {% endif %}
+              {% for choice in question.choices.all %}
+                {% if choice.is_correct %}
+                <div class="text-muted">Réponse correcte : {{ choice.choice_text }}</div>
+                {% endif %}
+              {% endfor %}
+              {% endif %}
+              {% if question.explanation %}
+              <div class="text-muted">{{ question.explanation }}</div>
+              {% endif %}
+            </div>
+          </details>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+      <button class="btn btn-save" type="submit">Soumettre le quiz</button>
+    </form>
+    </div>
+  </div>
+  </div>
+</div>
+{% endif %}
+{% if quiz_exists and not can_access_quiz %}
+<div class="alert alert-info mt-4">
+  Le quiz est réservé au gestionnaire de Floxy Made (rôle manager).
+</div>
+{% endif %}
+  </div>
+</div>
+
+<script>
+  (function () {
+    const focusToggle = document.getElementById('focusModeToggle');
+    const sections = document.querySelectorAll('.training-section');
+    if (!focusToggle || !sections.length) return;
+
+    function setActiveSection(targetId) {
+      sections.forEach(section => {
+        if (!targetId) {
+          section.classList.remove('training-focus');
+          section.classList.add('active');
+          return;
+        }
+        const isActive = section.id === targetId;
+        section.classList.toggle('training-focus', !isActive);
+        section.classList.toggle('active', isActive);
+      });
+    }
+
+    focusToggle.addEventListener('change', () => {
+      if (!focusToggle.checked) {
+        setActiveSection(null);
+        return;
+      }
+      const first = sections[0];
+      if (first) {
+        setActiveSection(first.id);
+        first.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+
+    document.querySelectorAll('.training-sticky-nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (!focusToggle.checked) return;
+        const targetId = link.getAttribute('href').replace('#', '');
+        setActiveSection(targetId);
+        const target = document.getElementById(targetId);
+        const body = target ? target.querySelector('[data-section-body]') : null;
+        if (body && !body.classList.contains('show') && window.bootstrap) {
+          const collapse = bootstrap.Collapse.getOrCreateInstance(body, { toggle: false });
+          collapse.show();
+        }
+      });
+    });
+  })();
+</script>
+{% endblock %}

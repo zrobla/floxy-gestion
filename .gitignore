@@ -1,0 +1,33 @@
+# Python / Django
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+
+# Virtualenvs
+.venv/
+.floxymade/
+
+# Django media/static collected
+media/
+staticfiles/
+
+# Tests
+.pytest_cache/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.*
+
+# Node
+node_modules/

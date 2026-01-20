@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+  <div>
+    <h1 class="mb-1">Glossaire Floxy Made</h1>
+    <p class="text-muted mb-0">Les termes clés pour piloter la formation.</p>
+  </div>
+  <a class="btn btn-secondary-premium btn-sm" href="/formation/">Retour formation</a>
+</div>
+
+<div class="card brand-card mb-4 shadow-sm border-0">
+  <div class="card-body">
+    <form class="d-flex flex-wrap gap-2" method="get">
+      <input class="form-control" type="search" name="q" value="{{ query }}" placeholder="Rechercher un terme, un module, un exemple..." />
+      <button class="btn btn-save" type="submit">Rechercher</button>
+      {% if query %}
+      <a class="btn btn-secondary-premium" href="/formation/glossaire/">Réinitialiser</a>
+      {% endif %}
+    </form>
+    <div class="small text-muted mt-2">{{ result_count }} résultat(s)</div>
+  </div>
+</div>
+
+<div class="row g-3">
+  {% for card in cards %}
+  <div class="col-lg-6">
+  <div class="card brand-card h-100 shadow-sm border-0">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start gap-2">
+          <div>
+            <div class="fw-semibold">{{ card.term }}</div>
+            <div class="small text-muted">Module : {{ card.lesson.title }}</div>
+          </div>
+          {% if card.lesson.week %}
+          <span class="badge badge-status badge-status--purple">S{{ card.lesson.week.week_number }}</span>
+          {% endif %}
+        </div>
+        <div class="text-muted mt-2">{{ card.rendered_definition|safe }}</div>
+        {% if card.rendered_example %}
+        <div class="mt-2">
+          <span class="fw-semibold">Exemple Floxy Made :</span>
+          <div class="text-muted">{{ card.rendered_example|safe }}</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <div class="alert alert-warning">Aucun terme trouvé.</div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

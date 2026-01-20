@@ -1,0 +1,25 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrahead %}
+{{ block.super }}
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_purple.css"
+/>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    flatpickr(".vDateField", {
+      dateFormat: "d/m/Y",
+      allowInput: true,
+    });
+    flatpickr(".vDateTimeField", {
+      enableTime: true,
+      time_24hr: true,
+      dateFormat: "d/m/Y H:i",
+      allowInput: true,
+    });
+  });
+</script>
+{% endblock %}

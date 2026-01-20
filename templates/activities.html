@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<h1 class="mb-4">Activités</h1>
+
+<div class="card brand-card mb-4">
+  <div class="card-body">
+    <h5 class="card-title">Prestations de l'institut</h5>
+    <p class="text-muted">Référentiel visuel des prestations Floxy Made.</p>
+    <div class="row g-3">
+      {% for prestation in prestations %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+          {% if prestation.image %}
+          <img class="card-img-top" src="{% static prestation.image %}" alt="{{ prestation.category.name }}" />
+          {% else %}
+          <div class="bg-light d-flex align-items-center justify-content-center" style="height: 160px;">
+            <span class="text-muted">{{ prestation.category.name }}</span>
+          </div>
+          {% endif %}
+          <div class="card-body">
+            <h6 class="card-title">{{ prestation.category.name }}</h6>
+            <ul class="list-unstyled mb-0">
+              {% for service in prestation.services %}
+              <li>{{ service.name }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="text-muted">Aucune prestation référencée.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% if can_manage %}
+<div class="accordion mb-4" id="createActivityAccordion">
+  <div class="accordion-item brand-card form-card">
+    <h2 class="accordion-header">
+      <button
+        class="accordion-button {% if not open_form %}collapsed{% endif %}"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#createActivityCollapse"
+      >
+        Créer une activité
+      </button>
+    </h2>
+    <div
+      id="createActivityCollapse"
+      class="accordion-collapse collapse {% if open_form %}show{% endif %}"
+      data-bs-parent="#createActivityAccordion"
+    >
+      <div class="accordion-body">
+        <form method="post" class="compact-form">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button class="btn btn-save" type="submit" name="create_activity">Enregistrer</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="alert alert-info">Création réservée aux managers.</div>
+{% endif %}
+
+<div class="card brand-card">
+  <div class="card-header">Liste des activités</div>
+  <div class="table-responsive">
+    <table class="table table-striped mb-0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Type</th>
+          <th>Prestation</th>
+          <th>Client</th>
+          <th>Statut</th>
+          <th>Montant attendu</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for activity in activities %}
+        <tr>
+          <td>{{ activity.id }}</td>
+          <td>{{ activity.get_type_display }}</td>
+          <td>{{ activity.primary_service.name|default:"-" }}</td>
+          <td>{{ activity.client|default:"-" }}</td>
+          <td>
+            {% if activity.status == "PAID" %}
+            <span class="badge badge-status badge-status--done">{{ activity.get_status_display }}</span>
+            {% elif activity.status == "IN_PROGRESS" %}
+            <span class="badge badge-status badge-status--progress">{{ activity.get_status_display }}</span>
+            {% elif activity.status == "TO_COLLECT" %}
+            <span class="badge badge-status badge-status--info">{{ activity.get_status_display }}</span>
+            {% elif activity.status == "CANCELED" %}
+            <span class="badge badge-status badge-status--warn">{{ activity.get_status_display }}</span>
+            {% else %}
+            <span class="badge badge-status bg-secondary">{{ activity.get_status_display }}</span>
+            {% endif %}
+          </td>
+          <td>{{ activity.expected_amount }}</td>
+          <td>
+            {% if can_manage %}
+            <form method="post" class="d-flex gap-2 align-items-center">
+              {% csrf_token %}
+              <input type="hidden" name="activity_id" value="{{ activity.id }}" />
+              <select name="status" class="form-select form-select-sm">
+                {% for value,label in status_form.fields.status.choices %}
+                <option value="{{ value }}" {% if value == activity.status %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+              <button class="btn btn-sm btn-secondary-premium" type="submit" name="update_status">Mettre à jour</button>
+            </form>
+            {% else %}
+            <span class="text-muted">Actions limitées</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="text-center">Aucune activité.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

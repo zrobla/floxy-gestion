@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if program %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+  <div>
+    <h1 class="mb-1">Reporting formation</h1>
+    <p class="text-muted mb-0">{{ program.title }}</p>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-secondary-premium" href="/formation/programme/{{ program.id }}/plan.pdf">Télécharger le plan PDF</a>
+    <a class="btn btn-secondary-premium" href="/formation/reporting/global.pdf">Exporter le rapport PDF</a>
+    <a class="btn btn-secondary-premium" href="/formation/programme/{{ program.id }}/">Retour au programme</a>
+  </div>
+</div>
+
+{% if not can_manage %}
+<div class="alert alert-info">Vue limitée à votre progression personnelle.</div>
+{% endif %}
+
+<div class="row g-4 mb-4">
+  <div class="col-md-3">
+    <div class="card brand-card h-100">
+      <div class="card-body">
+        <h6 class="text-muted">Participants</h6>
+        <div class="display-6">{{ total_enrollments }}</div>
+        <div class="small text-muted">{{ completed_enrollments }} terminée(s)</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card brand-card h-100">
+      <div class="card-body">
+        <h6 class="text-muted">Progression moyenne</h6>
+        <div class="display-6">{{ progress_avg }}%</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card brand-card h-100">
+      <div class="card-body">
+        <h6 class="text-muted">Score moyen</h6>
+        <div class="display-6">{{ evaluation_avg }}</div>
+        <div class="small text-muted">Évaluations finales</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card brand-card h-100">
+      <div class="card-body">
+        <h6 class="text-muted">Plans d'action</h6>
+        <div class="small">Planifié : {{ action_plan_summary.PLANNED|default:0 }}</div>
+        <div class="small">En cours : {{ action_plan_summary.IN_PROGRESS|default:0 }}</div>
+        <div class="small">Réalisé : {{ action_plan_summary.DONE|default:0 }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card brand-card">
+  <div class="card-header">Suivi des participants</div>
+  <div class="table-responsive">
+    <table class="table table-striped mb-0">
+      <thead>
+        <tr>
+          <th>Utilisateur</th>
+          <th>Statut</th>
+          <th>Progression</th>
+          <th>Évaluation</th>
+          <th>Plans 90 jours</th>
+          <th>Export</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for enrollment in enrollments %}
+        <tr>
+          <td>{{ enrollment.user }}</td>
+          <td>
+            <span class="badge badge-status {% if enrollment.status == 'COMPLETED' %}badge-status--done{% else %}badge-status--progress{% endif %}">
+              {{ enrollment.get_status_display }}
+            </span>
+          </td>
+          <td>{{ enrollment.progress_percent }}%</td>
+          <td>
+            {% if enrollment.evaluation %}
+            {{ enrollment.evaluation.score }}/100
+            {% else %}
+            <span class="text-muted">Non évalué</span>
+            {% endif %}
+          </td>
+          <td>{{ enrollment.action_plan_done }}/{{ enrollment.action_plan_total }}</td>
+          <td>
+            <a class="btn btn-sm btn-secondary-premium" href="/formation/reporting/enrollment/{{ enrollment.id }}/progress.pdf">PDF progression</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="text-center text-muted">Aucun participant.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="card brand-card">
+  <div class="card-body">
+    <p class="text-muted">Programme de formation non configuré.</p>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

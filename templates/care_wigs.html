@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Entretien perruques</h1>
+
+{% if can_manage %}
+<div class="accordion mb-4" id="createCareWigAccordion">
+  <div class="accordion-item brand-card form-card">
+    <h2 class="accordion-header">
+      <button
+        class="accordion-button {% if not open_form %}collapsed{% endif %}"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#createCareWigCollapse"
+      >
+        Créer une fiche
+      </button>
+    </h2>
+    <div
+      id="createCareWigCollapse"
+      class="accordion-collapse collapse {% if open_form %}show{% endif %}"
+      data-bs-parent="#createCareWigAccordion"
+    >
+      <div class="accordion-body">
+        <form method="post" class="compact-form">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button class="btn btn-save" type="submit">Enregistrer</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="alert alert-info">Création réservée aux managers.</div>
+{% endif %}
+
+<div class="card brand-card">
+  <div class="card-header">Liste des perruques</div>
+  <div class="table-responsive">
+    <table class="table table-striped mb-0">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Cliente</th>
+          <th>Statut</th>
+          <th>Date promise</th>
+          <th>Étiquette</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td>{{ item.code }}</td>
+          <td>{{ item.client|default:"-" }}</td>
+          <td>
+            {% if item.status == "READY" %}
+            <span class="badge badge-status badge-status--done">{{ item.get_status_display }}</span>
+            {% elif item.status == "IN_PROGRESS" %}
+            <span class="badge badge-status badge-status--progress">{{ item.get_status_display }}</span>
+            {% elif item.status == "DELIVERED" %}
+            <span class="badge badge-status badge-status--info">{{ item.get_status_display }}</span>
+            {% elif item.status == "CANCELED" %}
+            <span class="badge badge-status badge-status--warn">{{ item.get_status_display }}</span>
+            {% else %}
+            <span class="badge badge-status bg-secondary">{{ item.get_status_display }}</span>
+            {% endif %}
+          </td>
+          <td>{{ item.promised_date|date:"d/m/Y"|default:"Non définie" }}</td>
+          <td>
+            <a class="btn btn-sm btn-secondary-premium" href="/wigs/care-wigs/{{ item.id }}/label.pdf">Imprimer étiquette</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="text-center">Aucune perruque en entretien.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card brand-card">
+  <div class="card-body">
+    <h1 class="h4">Vérification du certificat</h1>
+    <p class="text-muted">{{ certificate.certificate_number }}</p>
+
+    {% if certificate.status == "ISSUED" %}
+    <div class="alert alert-success">Certificat valide</div>
+    {% else %}
+    <div class="alert alert-warning">Certificat révoqué</div>
+    {% endif %}
+
+    <ul class="list-unstyled mb-0">
+      <li><strong>Participant :</strong> {{ holder_name }}</li>
+      <li><strong>Cours :</strong> {{ certificate.enrollment.course.title }}</li>
+      <li><strong>Date d'émission :</strong> {{ certificate.issued_at|date:"d/m/Y" }}</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

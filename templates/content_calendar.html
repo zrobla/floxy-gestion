@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Calendrier contenus</h1>
+
+{% if can_manage %}
+<div class="accordion mb-4" id="createContentAccordion">
+  <div class="accordion-item brand-card form-card">
+    <h2 class="accordion-header">
+      <button
+        class="accordion-button {% if not open_form %}collapsed{% endif %}"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#createContentCollapse"
+      >
+        Créer un contenu
+      </button>
+    </h2>
+    <div
+      id="createContentCollapse"
+      class="accordion-collapse collapse {% if open_form %}show{% endif %}"
+      data-bs-parent="#createContentAccordion"
+    >
+      <div class="accordion-body">
+        <form method="post" class="compact-form">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button class="btn btn-save" type="submit" name="create_content">Enregistrer</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="alert alert-info">Création réservée aux managers.</div>
+{% endif %}
+
+<div class="card brand-card mb-4">
+  <div class="card-header">File "À valider"</div>
+  <div class="card-body">
+    {% for item in queue %}
+    <div class="border rounded p-3 mb-3">
+      <h5>{{ item.title }}</h5>
+      <p class="mb-1">Plateforme : {{ item.get_platform_display }}</p>
+      <p class="mb-1">
+        Statut :
+        {% if item.status == "APPROVED" %}
+        <span class="badge badge-status badge-status--done">{{ item.get_status_display }}</span>
+        {% elif item.status == "TO_VALIDATE" %}
+        <span class="badge badge-status badge-status--purple">{{ item.get_status_display }}</span>
+        {% elif item.status == "IN_CREATION" %}
+        <span class="badge badge-status badge-status--progress">{{ item.get_status_display }}</span>
+        {% elif item.status == "REJECTED" %}
+        <span class="badge badge-status badge-status--warn">{{ item.get_status_display }}</span>
+        {% elif item.status == "SCHEDULED" %}
+        <span class="badge badge-status badge-status--info">{{ item.get_status_display }}</span>
+        {% else %}
+        <span class="badge badge-status bg-secondary">{{ item.get_status_display }}</span>
+        {% endif %}
+      </p>
+      {% if is_owner %}
+      <form method="post" class="d-flex gap-2 align-items-center">
+        {% csrf_token %}
+        <input type="hidden" name="content_id" value="{{ item.id }}" />
+        <input type="text" name="comment" class="form-control" placeholder="Commentaire" />
+        <button class="btn btn-secondary-premium" type="submit" name="approve">Valider</button>
+        <button class="btn btn-secondary-premium" type="submit" name="reject">Refuser</button>
+      </form>
+      {% else %}
+      <p class="text-muted">Validation réservée au propriétaire.</p>
+      {% endif %}
+    </div>
+    {% empty %}
+    <p class="text-muted">Aucun contenu en attente.</p>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="card brand-card">
+  <div class="card-header">Tous les contenus</div>
+  <div class="table-responsive">
+    <table class="table table-striped mb-0">
+      <thead>
+        <tr>
+          <th>Titre</th>
+          <th>Plateforme</th>
+          <th>Statut</th>
+          <th>Programmation</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td>{{ item.title }}</td>
+          <td>{{ item.get_platform_display }}</td>
+          <td>
+            {% if item.status == "APPROVED" %}
+            <span class="badge badge-status badge-status--done">{{ item.get_status_display }}</span>
+            {% elif item.status == "TO_VALIDATE" %}
+            <span class="badge badge-status badge-status--purple">{{ item.get_status_display }}</span>
+            {% elif item.status == "IN_CREATION" %}
+            <span class="badge badge-status badge-status--progress">{{ item.get_status_display }}</span>
+            {% elif item.status == "REJECTED" %}
+            <span class="badge badge-status badge-status--warn">{{ item.get_status_display }}</span>
+            {% elif item.status == "SCHEDULED" %}
+            <span class="badge badge-status badge-status--info">{{ item.get_status_display }}</span>
+            {% else %}
+            <span class="badge badge-status bg-secondary">{{ item.get_status_display }}</span>
+            {% endif %}
+          </td>
+          <td>{{ item.scheduled_at|date:"d/m/Y H:i"|default:"Non planifié" }}</td>
+          <td>
+            {% if can_manage %}
+            <form method="post" class="d-flex gap-2">
+              {% csrf_token %}
+              <input type="hidden" name="content_id" value="{{ item.id }}" />
+              {% if item.status != "TO_VALIDATE" %}
+              <button class="btn btn-sm btn-secondary-premium" type="submit" name="submit_for_approval">Soumettre</button>
+              {% endif %}
+              {% if item.status == "APPROVED" or item.status == "SCHEDULED" %}
+              <button class="btn btn-sm btn-secondary-premium" type="submit" name="publish">Publier</button>
+              {% endif %}
+            </form>
+            {% else %}
+            <span class="text-muted">Actions limitées</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="text-center">Aucun contenu.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

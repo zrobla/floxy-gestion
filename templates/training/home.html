@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+{% if program %}
+<style>
+  .training-hero {
+    background: linear-gradient(135deg, #fff6e7 0%, #eef4ff 100%);
+    border: 1px solid #f2e6d1;
+  }
+  .training-stat {
+    background: #ffffff;
+    border: 1px solid #f0e9dc;
+  }
+  .training-title {
+    color: #2f1d15;
+  }
+  .training-subtitle {
+    color: #6b4d3a;
+  }
+</style>
+<div class="card brand-card shadow-sm border-0 mb-4">
+  <div class="card-body d-flex flex-wrap align-items-center justify-content-between gap-3 training-hero">
+    <div>
+      <h1 class="h4 mb-2 training-title">Formation Manager Floxy Made</h1>
+      <p class="training-subtitle mb-1">{{ program.description }}</p>
+      <div class="small training-subtitle">Objectif : {{ program.objective }}</div>
+    </div>
+    <div class="text-end">
+      <span class="badge badge-status badge-status--purple">{{ program.duration_weeks }} semaines</span>
+      <div class="mt-2 small text-muted">Progression</div>
+      <div class="fw-semibold">{{ progress_percent }}%</div>
+      <div class="progress mt-2" style="height: 8px;">
+        <div class="progress-bar" role="progressbar" style="width: {{ progress_percent }}%"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card brand-card shadow-sm border-0 h-100">
+      <div class="card-header bg-transparent d-flex align-items-center justify-content-between">
+        <h5 class="card-title mb-0">Actions rapides</h5>
+        <span class="badge badge-status badge-status--progress">Gestionnaire</span>
+      </div>
+      <div class="card-body">
+        {% if not enrollment %}
+        <form method="post">
+          {% csrf_token %}
+          <button class="btn btn-save" type="submit" name="start_training">Démarrer la formation</button>
+        </form>
+        {% else %}
+        <div class="d-flex flex-wrap gap-2">
+          <a class="btn btn-secondary-premium" href="/formation/programme/{{ program.id }}/">Accéder au programme</a>
+          <a class="btn btn-secondary-premium" href="/formation/glossaire/">Glossaire</a>
+          {% if can_manage %}
+          <a class="btn btn-secondary-premium" href="/formation/reporting/">Reporting formation</a>
+          {% endif %}
+        </div>
+        {% endif %}
+        <div class="mt-4">
+          <div class="small text-muted">Étapes recommandées</div>
+          <ol class="small text-muted mt-2 mb-0">
+            <li>Consulter le programme et la semaine en cours.</li>
+            <li>Étudier les supports et le lexique.</li>
+            <li>Valider le quiz et la checklist.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card brand-card shadow-sm border-0 h-100">
+      <div class="card-header bg-transparent d-flex align-items-center justify-content-between">
+        <h5 class="card-title mb-0">Feuille de route</h5>
+        <span class="badge badge-status badge-status--purple">{{ program.weeks.all|length }} semaines</span>
+      </div>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+          {% for week in program.weeks.all %}
+          <li class="list-group-item">
+            <div class="fw-semibold">Semaine {{ week.week_number }} : {{ week.title }}</div>
+            <div class="small text-muted">{{ week.objective }}</div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mt-1">
+  <div class="col-md-3">
+    <div class="card training-stat shadow-sm border-0">
+      <div class="card-body">
+        <div class="small text-muted text-uppercase">Modules</div>
+        <div class="fw-semibold">{{ total_lessons }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card training-stat shadow-sm border-0">
+      <div class="card-body">
+        <div class="small text-muted text-uppercase">Validés</div>
+        <div class="fw-semibold text-success">{{ completed_lessons }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card training-stat shadow-sm border-0">
+      <div class="card-body">
+        <div class="small text-muted text-uppercase">Restants</div>
+        <div class="fw-semibold text-warning">{{ remaining_lessons }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card training-stat shadow-sm border-0">
+      <div class="card-body">
+        <div class="small text-muted text-uppercase">Quiz validés</div>
+        <div class="fw-semibold text-primary">{{ quiz_passed_count }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="card brand-card shadow-sm border-0">
+  <div class="card-body">
+    <p class="text-muted">Programme de formation non configuré.</p>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

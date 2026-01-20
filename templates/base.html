@@ -1,0 +1,419 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Floxy Made - {{ titre }}</title>
+    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_purple.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+    <style>
+      :root {
+        --accent-primary: #7c4dff;
+        --accent-secondary: #ff9f1c;
+      }
+      .theme-dashboard {
+        --accent-primary: #5b2f4c;
+        --accent-secondary: #caa2b1;
+      }
+      .theme-activities {
+        --accent-primary: #2a9d8f;
+        --accent-secondary: #6bd1c2;
+      }
+      .theme-care {
+        --accent-primary: #d9689c;
+        --accent-secondary: #ffb6c1;
+      }
+      .theme-tasks {
+        --accent-primary: #2d6cdf;
+        --accent-secondary: #6aa8ff;
+      }
+      .theme-content {
+        --accent-primary: #7c4dff;
+        --accent-secondary: #b392ff;
+      }
+      .theme-profile {
+        --accent-primary: #3d3d3d;
+        --accent-secondary: #9b9b9b;
+      }
+      .theme-training {
+        --accent-primary: #1f7a8c;
+        --accent-secondary: #9fd3c7;
+      }
+      body {
+        font-family: "Inter", "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top, #ffffff 0%, #f4eef6 45%);
+        color: #2a1c2b;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5 {
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .brand-card {
+        border: none;
+        border-radius: 18px;
+        box-shadow: 0 20px 45px rgba(36, 21, 31, 0.12);
+        background: #ffffff;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .brand-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 26px 55px rgba(36, 21, 31, 0.16);
+      }
+      .brand-header {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 18px;
+        box-shadow: 0 18px 36px rgba(36, 21, 31, 0.12);
+        padding: 16px 24px;
+        backdrop-filter: blur(6px);
+      }
+      .brand-sidebar {
+        width: 240px;
+        background: linear-gradient(180deg, #24151f, #4f2b45);
+        color: #f5e9f0;
+        box-shadow: 8px 0 24px rgba(36, 21, 31, 0.2);
+      }
+      .brand-sidebar .nav-link {
+        color: #f5e9f0;
+        border-radius: 12px;
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.2s ease;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .brand-sidebar .nav-link i {
+        width: 18px;
+        text-align: center;
+      }
+      .brand-sidebar .nav-link:hover {
+        background: rgba(255, 255, 255, 0.12);
+        color: #ffffff;
+        transform: translateX(2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      }
+      .brand-sidebar .nav-link.active {
+        background: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+        position: relative;
+      }
+      .brand-sidebar .nav-link.active::before {
+        content: "";
+        position: absolute;
+        left: -6px;
+        top: 8px;
+        bottom: 8px;
+        width: 4px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #ff9f1c, #7c4dff);
+        box-shadow: 0 0 12px rgba(255, 159, 28, 0.8);
+      }
+      .brand-sidebar .nav-link.disabled {
+        opacity: 0.6;
+      }
+      .brand-sidebar .brand-logo {
+        width: 160px;
+      }
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--accent-primary),
+          var(--accent-secondary)
+        );
+        border: none;
+        box-shadow: 0 12px 24px rgba(124, 77, 255, 0.25);
+      }
+      .btn-primary:hover {
+        opacity: 0.95;
+      }
+      .btn-save {
+        background: #0b1f3b;
+        color: #ffffff;
+        border: none;
+        box-shadow: 0 12px 24px rgba(11, 31, 59, 0.25);
+      }
+      .btn-save:hover {
+        background: #132d5a;
+        color: #ffffff;
+      }
+      .btn-secondary-premium {
+        background: #ffffff;
+        border: 1px solid rgba(11, 31, 59, 0.3);
+        color: #0b1f3b;
+        box-shadow: 0 8px 18px rgba(11, 31, 59, 0.12);
+      }
+      .btn-secondary-premium:hover {
+        background: rgba(11, 31, 59, 0.08);
+        color: #0b1f3b;
+      }
+      .btn-outline-dark {
+        border-radius: 999px;
+      }
+      .nav-tabs {
+        border-bottom: none;
+        gap: 8px;
+      }
+      .nav-tabs .nav-link {
+        border: none;
+        border-radius: 999px;
+        background: rgba(36, 21, 31, 0.05);
+        color: #2a1c2b;
+        padding: 10px 16px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .nav-tabs .nav-link.active {
+        background: linear-gradient(
+          135deg,
+          var(--accent-primary),
+          var(--accent-secondary)
+        );
+        color: #ffffff;
+        box-shadow: 0 12px 24px rgba(124, 77, 255, 0.25);
+      }
+      .table thead th {
+        background: rgba(36, 21, 31, 0.04);
+        border: none;
+      }
+      .table tbody tr {
+        border-color: rgba(36, 21, 31, 0.08);
+      }
+      .form-control,
+      .form-select {
+        border-radius: 12px;
+        border-color: rgba(36, 21, 31, 0.15);
+        box-shadow: none;
+      }
+      .form-control:focus,
+      .form-select:focus {
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 0.25rem rgba(124, 77, 255, 0.15);
+      }
+      .form-card {
+        border: 1px solid rgba(36, 21, 31, 0.08);
+      }
+      .form-card .card-header {
+        background: rgba(11, 31, 59, 0.08);
+        border-bottom: 1px solid rgba(36, 21, 31, 0.08);
+        font-weight: 600;
+      }
+      .form-card input[type="text"],
+      .form-card input[type="number"],
+      .form-card input[type="email"],
+      .form-card input[type="datetime-local"],
+      .form-card input[type="date"],
+      .form-card select,
+      .form-card textarea {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid rgba(36, 21, 31, 0.15);
+        padding: 0.5rem 0.75rem;
+      }
+      .form-card label {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+      }
+      .compact-form p {
+        margin-bottom: 0.5rem;
+      }
+      .compact-form label {
+        font-size: 0.85rem;
+      }
+      .compact-form input,
+      .compact-form select,
+      .compact-form textarea {
+        padding: 0.35rem 0.5rem;
+        font-size: 0.85rem;
+      }
+      .compact-form textarea {
+        min-height: 80px;
+      }
+      .badge-status {
+        font-weight: 500;
+      }
+      .badge-status--progress {
+        background: #ffb703;
+      }
+      .badge-status--done {
+        background: #2a9d8f;
+      }
+      .badge-status--warn {
+        background: #ef476f;
+      }
+      .badge-status--info {
+        background: var(--accent-primary);
+      }
+      .badge-status--purple {
+        background: var(--accent-primary);
+      }
+      .sparkline {
+        display: flex;
+        gap: 4px;
+        align-items: flex-end;
+        height: 28px;
+        margin-top: 12px;
+      }
+      .sparkline span {
+        display: inline-block;
+        width: 6px;
+        border-radius: 6px;
+        background: linear-gradient(
+          180deg,
+          var(--accent-primary),
+          var(--accent-secondary)
+        );
+      }
+      .content-area {
+        animation: fadeIn 0.4s ease;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @media (max-width: 992px) {
+        .app-shell {
+          flex-direction: column;
+        }
+        .brand-sidebar {
+          width: 100%;
+          position: static;
+        }
+      }
+    </style>
+  </head>
+  <body class="theme-{{ page_theme|default:'dashboard' }}">
+    <div class="app-shell d-flex min-vh-100">
+      <aside class="brand-sidebar p-4 d-flex flex-column">
+        <div class="text-center mb-4">
+          <img
+            class="brand-logo img-fluid"
+            src="{% static 'logo_floxymade_small.png' %}"
+            alt="Logo Floxy Made"
+          />
+          <div class="mt-2 text-uppercase small fw-semibold text-white-50">
+            Management
+          </div>
+        </div>
+        <nav class="nav flex-column">
+          <a class="nav-link" href="/dashboard/">
+            <i class="bi bi-speedometer2"></i> Dashboard
+          </a>
+          <a class="nav-link" href="/aujourdhui/">
+            <i class="bi bi-sun"></i> Aujourd'hui
+          </a>
+          <a class="nav-link" href="/activites/">
+            <i class="bi bi-activity"></i> Activités
+          </a>
+          <a class="nav-link" href="/prestations/">
+            <i class="bi bi-bag-heart"></i> Prestations
+          </a>
+          <a class="nav-link" href="/perruques-entretien/">
+            <i class="bi bi-scissors"></i> Entretien perruques
+          </a>
+          <a class="nav-link" href="/taches/">
+            <i class="bi bi-check2-square"></i> Tâches
+          </a>
+          <a class="nav-link" href="/contenus/">
+            <i class="bi bi-calendar-event"></i> Calendrier contenus
+          </a>
+          <a class="nav-link" href="/formation/">
+            <i class="bi bi-mortarboard"></i> Formation
+          </a>
+          {% if page_theme == "training" %}
+          <a class="nav-link" href="/formation/glossaire/">
+            <i class="bi bi-journal-text"></i> Glossaire
+          </a>
+          {% endif %}
+          <a class="nav-link" href="/profil/">
+            <i class="bi bi-person-circle"></i> Profil
+          </a>
+        </nav>
+        <div class="mt-auto text-center small text-white-50">
+          Floxy Made Management
+        </div>
+      </aside>
+      <div class="flex-grow-1 p-4">
+        <header class="brand-header d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h1 class="h4 mb-1">{{ titre }}</h1>
+            <p class="mb-0 text-muted">Tableau de bord Floxy Made</p>
+          </div>
+          <div class="d-flex align-items-center gap-3">
+            {% if user.is_authenticated %}
+            <span class="badge bg-dark">{{ user.role }}</span>
+            <a class="btn btn-outline-dark btn-sm" href="/logout/">Déconnexion</a>
+            {% else %}
+            <a class="btn btn-dark btn-sm" href="/login/">Connexion</a>
+            {% endif %}
+          </div>
+        </header>
+        <main class="content-area">
+          {% if auth_required %}
+          <div class="alert alert-warning">
+            Veuillez vous connecter pour accéder aux fonctionnalités.
+          </div>
+          {% endif %}
+          {% if messages %}
+          {% for message in messages %}
+          {% if "error" in message.tags %}
+          <div class="alert alert-danger">{{ message }}</div>
+          {% else %}
+          <div class="alert alert-{{ message.tags|default:"info" }}">{{ message }}</div>
+          {% endif %}
+          {% endfor %}
+          {% endif %}
+          {% block content %}{% endblock %}
+        </main>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+      const links = document.querySelectorAll(".brand-sidebar .nav-link");
+      links.forEach((link) => {
+        if (link.getAttribute("href") === window.location.pathname) {
+          link.classList.add("active");
+        }
+      });
+      flatpickr(".date-picker", {
+        dateFormat: "d/m/Y",
+        allowInput: true,
+      });
+      flatpickr(".datetime-picker", {
+        enableTime: true,
+        time_24hr: true,
+        dateFormat: "d/m/Y H:i",
+        allowInput: true,
+      });
+    </script>
+  </body>
+</html>
