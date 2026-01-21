@@ -158,6 +158,9 @@ def training_program_detail(request, program_id):
             "weeks__lessons__sectors",
             "weeks__lessons__resources",
             "weeks__lessons__checklist_items",
+            "weeks__lessons__study_materials",
+            "weeks__lessons__concept_cards",
+            "weeks__lessons__quiz",
         ),
         pk=program_id,
     )
@@ -209,6 +212,12 @@ def training_program_detail(request, program_id):
             lesson.checklist_done = summary["done"]
             lesson.checklist_total = summary["total"]
             lesson.is_completed = lesson.id in completed_lessons
+            lesson.has_content = bool(lesson.content_md or lesson.description)
+            lesson.has_supports = bool(lesson.study_materials.all())
+            lesson.has_lexique = bool(lesson.concept_cards.all())
+            lesson.has_resources = bool(lesson.resources.all())
+            lesson.has_checklist = bool(lesson.checklist_items.all())
+            lesson.has_quiz = bool(getattr(lesson, "quiz", None))
 
     if request.method == "POST":
         if "create_action_plan" in request.POST:

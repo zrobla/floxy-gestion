@@ -3,16 +3,53 @@
 {% block content %}
 <style>
   .training-hero {
-    background: linear-gradient(135deg, #f7f1ff 0%, #e9f7f1 100%);
-    border: 1px solid #e7ddff;
+    background: linear-gradient(135deg, var(--training-hero-start) 0%, var(--training-hero-end) 100%);
+    border: 1px solid var(--training-hero-border);
+    color: var(--training-title-color);
   }
   .training-stat {
-    background: #ffffff;
-    border: 1px solid #efe6ff;
+    background: var(--training-card-table);
+    border: 1px solid var(--training-stat-border);
   }
+  .training-card--weeks { background: var(--training-card-weeks); }
+  .training-card--evaluation { background: var(--training-card-evaluation); }
+  .training-card--glossary { background: var(--training-card-glossary); }
+  .training-card--actions { background: var(--training-card-actions); }
   .training-title {
-    color: #2f1d15;
+    color: var(--training-title-color);
   }
+  .training-hero .text-muted {
+    color: rgba(248, 250, 252, 0.7) !important;
+  }
+  .training-rubric-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    color: #f8fafc;
+  }
+  .training-rubric-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+  }
+  .training-rubric--content { background: var(--training-card-content); }
+  .training-rubric--content .training-rubric-dot { background: var(--training-card-content); }
+  .training-rubric--supports { background: var(--training-card-supports); }
+  .training-rubric--supports .training-rubric-dot { background: var(--training-card-supports); }
+  .training-rubric--lexique { background: var(--training-card-lexique); }
+  .training-rubric--lexique .training-rubric-dot { background: var(--training-card-lexique); }
+  .training-rubric--resources { background: var(--training-card-resources); }
+  .training-rubric--resources .training-rubric-dot { background: var(--training-card-resources); }
+  .training-rubric--checklist { background: var(--training-card-checklist); }
+  .training-rubric--checklist .training-rubric-dot { background: var(--training-card-checklist); }
+  .training-rubric--quiz { background: var(--training-card-quiz); }
+  .training-rubric--quiz .training-rubric-dot { background: var(--training-card-quiz); }
 </style>
 <div class="card brand-card shadow-sm border-0 mb-4">
   <div class="card-body d-flex flex-wrap align-items-center justify-content-between gap-3 training-hero">
@@ -83,7 +120,7 @@
 <div class="row g-4">
   <div class="col-lg-8">
     {% for week in program.weeks.all %}
-    <div class="card brand-card mb-3 shadow-sm border-0">
+    <div class="card brand-card mb-3 shadow-sm border-0 training-card--weeks">
       <div class="card-body">
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
           <div>
@@ -113,6 +150,38 @@
                     </span>
                     {% endif %}
                   </div>
+                  <div class="d-flex flex-wrap gap-2 mt-2">
+                    {% if lesson.has_content %}
+                    <span class="training-rubric-pill training-rubric--content">
+                      <span class="training-rubric-dot"></span>Contenu
+                    </span>
+                    {% endif %}
+                    {% if lesson.has_supports %}
+                    <span class="training-rubric-pill training-rubric--supports">
+                      <span class="training-rubric-dot"></span>Supports
+                    </span>
+                    {% endif %}
+                    {% if lesson.has_lexique %}
+                    <span class="training-rubric-pill training-rubric--lexique">
+                      <span class="training-rubric-dot"></span>Lexique
+                    </span>
+                    {% endif %}
+                    {% if lesson.has_resources %}
+                    <span class="training-rubric-pill training-rubric--resources">
+                      <span class="training-rubric-dot"></span>Ressources
+                    </span>
+                    {% endif %}
+                    {% if lesson.has_checklist %}
+                    <span class="training-rubric-pill training-rubric--checklist">
+                      <span class="training-rubric-dot"></span>Checklist
+                    </span>
+                    {% endif %}
+                    {% if lesson.has_quiz %}
+                    <span class="training-rubric-pill training-rubric--quiz">
+                      <span class="training-rubric-dot"></span>Quiz
+                    </span>
+                    {% endif %}
+                  </div>
                 </div>
                 <div class="d-flex flex-column gap-2">
                   <a class="btn btn-sm btn-secondary-premium" href="/formation/module/{{ lesson.id }}/">Voir le module</a>
@@ -135,7 +204,7 @@
     {% endfor %}
   </div>
   <div class="col-lg-4">
-    <div class="card brand-card mb-4 shadow-sm border-0">
+    <div class="card brand-card mb-4 shadow-sm border-0 training-card--evaluation">
       <div class="card-body">
         <h5 class="card-title">Évaluation finale</h5>
         {% if evaluation %}
@@ -150,7 +219,7 @@
         <a class="btn btn-secondary-premium btn-sm mt-3" href="/formation/programme/{{ program.id }}/evaluation/">Accéder à l'évaluation</a>
       </div>
     </div>
-    <div class="card brand-card mb-4 shadow-sm border-0">
+    <div class="card brand-card mb-4 shadow-sm border-0 training-card--glossary">
       <div class="card-body">
         <h5 class="card-title">Mini glossaire</h5>
         {% if mini_glossary %}
@@ -179,7 +248,7 @@
         {% endif %}
       </div>
     </div>
-    <div class="card brand-card shadow-sm border-0">
+    <div class="card brand-card shadow-sm border-0 training-card--actions">
       <div class="card-body">
         <h5 class="card-title">Plan d'actions 90 jours</h5>
         <p class="text-muted small">Transformez les acquis en actions mesurables.</p>

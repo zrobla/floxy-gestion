@@ -1,7 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+<style>
+  .training-evaluation-hero {
+    background: linear-gradient(135deg, var(--training-hero-start) 0%, var(--training-hero-end) 100%);
+    border: 1px solid var(--training-hero-border);
+    color: var(--training-title-color);
+  }
+  .training-evaluation-card {
+    background: var(--training-card-evaluation);
+  }
+  .training-evaluation-hero .text-muted {
+    color: rgba(248, 250, 252, 0.7) !important;
+  }
+</style>
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3 training-evaluation-hero p-3 rounded-4">
   <div>
     <h1>Évaluation finale</h1>
     <p class="text-muted">Validez les compétences acquises durant la formation.</p>
@@ -12,7 +25,7 @@
   </div>
 </div>
 
-<div class="card brand-card">
+<div class="card brand-card training-evaluation-card">
   <div class="card-body">
     {% if evaluation %}
     <div class="alert alert-info">

@@ -54,6 +54,26 @@
       .theme-training {
         --accent-primary: #1f7a8c;
         --accent-secondary: #9fd3c7;
+        --training-hero-start: #2b1c17;
+        --training-hero-end: #122233;
+        --training-hero-border: #1b2430;
+        --training-stat-border: #2a3240;
+        --training-card-content: #3b2520;
+        --training-card-supports: #243254;
+        --training-card-lexique: #2c2448;
+        --training-card-status: #1e3a2c;
+        --training-card-resources: #3d2b1f;
+        --training-card-checklist: #3b3520;
+        --training-card-quiz: #1f3b35;
+        --training-card-actions: #2c2752;
+        --training-card-roadmap: #3b2323;
+        --training-card-weeks: #2f2758;
+        --training-card-evaluation: #1b3344;
+        --training-card-glossary: #3b2c24;
+        --training-card-reporting: #22323c;
+        --training-card-table: #1b1f2a;
+        --training-title-color: #f8fafc;
+        --training-subtitle-color: #d6e0ea;
       }
       body {
         font-family: "Inter", "Segoe UI", sans-serif;
@@ -78,6 +98,44 @@
       .brand-card:hover {
         transform: translateY(-4px);
         box-shadow: 0 26px 55px rgba(36, 21, 31, 0.16);
+      }
+      .theme-training .training-card--content,
+      .theme-training .training-card--supports,
+      .theme-training .training-card--lexique,
+      .theme-training .training-card--status,
+      .theme-training .training-card--resources,
+      .theme-training .training-card--checklist,
+      .theme-training .training-card--quiz,
+      .theme-training .training-card--actions,
+      .theme-training .training-card--roadmap,
+      .theme-training .training-card--weeks,
+      .theme-training .training-card--evaluation,
+      .theme-training .training-card--glossary,
+      .theme-training .training-reporting-stat,
+      .theme-training .training-reporting-table,
+      .theme-training .training-evaluation-card,
+      .theme-training .training-stat,
+      .theme-training .glossary-card {
+        color: #f8fafc;
+      }
+      .theme-training .training-card--content .text-muted,
+      .theme-training .training-card--supports .text-muted,
+      .theme-training .training-card--lexique .text-muted,
+      .theme-training .training-card--status .text-muted,
+      .theme-training .training-card--resources .text-muted,
+      .theme-training .training-card--checklist .text-muted,
+      .theme-training .training-card--quiz .text-muted,
+      .theme-training .training-card--actions .text-muted,
+      .theme-training .training-card--roadmap .text-muted,
+      .theme-training .training-card--weeks .text-muted,
+      .theme-training .training-card--evaluation .text-muted,
+      .theme-training .training-card--glossary .text-muted,
+      .theme-training .training-reporting-stat .text-muted,
+      .theme-training .training-reporting-table .text-muted,
+      .theme-training .training-evaluation-card .text-muted,
+      .theme-training .training-stat .text-muted,
+      .theme-training .glossary-card .text-muted {
+        color: rgba(248, 250, 252, 0.7) !important;
       }
       .brand-header {
         background: rgba(255, 255, 255, 0.9);

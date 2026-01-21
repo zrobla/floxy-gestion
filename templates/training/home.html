@@ -3,18 +3,24 @@
 {% if program %}
 <style>
   .training-hero {
-    background: linear-gradient(135deg, #fff6e7 0%, #eef4ff 100%);
-    border: 1px solid #f2e6d1;
+    background: linear-gradient(135deg, var(--training-hero-start) 0%, var(--training-hero-end) 100%);
+    border: 1px solid var(--training-hero-border);
+    color: var(--training-title-color);
   }
   .training-stat {
-    background: #ffffff;
-    border: 1px solid #f0e9dc;
+    background: var(--training-card-table);
+    border: 1px solid var(--training-stat-border);
   }
+  .training-card--actions { background: var(--training-card-actions); }
+  .training-card--roadmap { background: var(--training-card-roadmap); }
   .training-title {
-    color: #2f1d15;
+    color: var(--training-title-color);
   }
   .training-subtitle {
-    color: #6b4d3a;
+    color: var(--training-subtitle-color);
+  }
+  .training-hero .text-muted {
+    color: rgba(248, 250, 252, 0.7) !important;
   }
 </style>
 <div class="card brand-card shadow-sm border-0 mb-4">
@@ -37,7 +43,7 @@
 
 <div class="row g-4">
   <div class="col-lg-8">
-    <div class="card brand-card shadow-sm border-0 h-100">
+    <div class="card brand-card shadow-sm border-0 h-100 training-card--actions">
       <div class="card-header bg-transparent d-flex align-items-center justify-content-between">
         <h5 class="card-title mb-0">Actions rapides</h5>
         <span class="badge badge-status badge-status--progress">Gestionnaire</span>
@@ -69,7 +75,7 @@
     </div>
   </div>
   <div class="col-lg-4">
-    <div class="card brand-card shadow-sm border-0 h-100">
+    <div class="card brand-card shadow-sm border-0 h-100 training-card--roadmap">
       <div class="card-header bg-transparent d-flex align-items-center justify-content-between">
         <h5 class="card-title mb-0">Feuille de route</h5>
         <span class="badge badge-status badge-status--purple">{{ program.weeks.all|length }} semaines</span>

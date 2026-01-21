@@ -14,12 +14,42 @@
     box-shadow: 0 12px 24px rgba(16, 24, 40, 0.08);
   }
   .training-section-card .card-header {
-    background: linear-gradient(135deg, #fff7ec 0%, #f0f6ff 100%);
-    border-bottom: 1px solid #f3e8d8;
+    background: linear-gradient(135deg, var(--training-hero-start) 0%, var(--training-hero-end) 100%);
+    border-bottom: 1px solid var(--training-hero-border);
   }
   .training-section-card .card-title {
-    color: #2f1d15;
+    color: var(--training-title-color);
   }
+  .training-stat {
+    background: var(--training-card-table);
+    border: 1px solid var(--training-stat-border);
+  }
+  .training-card--content { background: var(--training-card-content); }
+  .training-card--supports { background: var(--training-card-supports); }
+  .training-card--lexique { background: var(--training-card-lexique); }
+  .training-card--status { background: var(--training-card-status); }
+  .training-card--resources { background: var(--training-card-resources); }
+  .training-card--checklist { background: var(--training-card-checklist); }
+  .training-card--quiz { background: var(--training-card-quiz); }
+  .training-legend {
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
+    margin-top: 16px;
+    padding-top: 16px;
+  }
+  .training-legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    display: inline-block;
+  }
+  .training-legend-dot--content { background: var(--training-card-content); }
+  .training-legend-dot--supports { background: var(--training-card-supports); }
+  .training-legend-dot--lexique { background: var(--training-card-lexique); }
+  .training-legend-dot--status { background: var(--training-card-status); }
+  .training-legend-dot--resources { background: var(--training-card-resources); }
+  .training-legend-dot--checklist { background: var(--training-card-checklist); }
+  .training-legend-dot--quiz { background: var(--training-card-quiz); }
   .training-focus {
     opacity: .4;
     pointer-events: none;
@@ -60,6 +90,39 @@
             </div>
             <div class="small text-muted mt-1">Affiche une section à la fois.</div>
           </div>
+          <div class="training-legend">
+            <div class="small text-uppercase text-muted fw-semibold">Repères couleurs</div>
+            <div class="d-flex flex-column gap-2 mt-2 small text-muted">
+              <div class="d-flex align-items-center gap-2">
+                <span class="training-legend-dot training-legend-dot--content"></span>
+                <span>Contenu</span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="training-legend-dot training-legend-dot--supports"></span>
+                <span>Supports d'étude</span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="training-legend-dot training-legend-dot--lexique"></span>
+                <span>Lexique</span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="training-legend-dot training-legend-dot--status"></span>
+                <span>Statut & progression</span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="training-legend-dot training-legend-dot--resources"></span>
+                <span>Ressources</span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="training-legend-dot training-legend-dot--checklist"></span>
+                <span>Checklist</span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="training-legend-dot training-legend-dot--quiz"></span>
+                <span>Quiz</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -67,7 +130,7 @@
   <div class="col-lg-9">
     <div class="row g-3 mb-4">
       <div class="col-md-3">
-        <div class="card brand-card shadow-sm border-0 h-100">
+        <div class="card brand-card shadow-sm border-0 h-100 training-stat">
           <div class="card-body">
             <div class="text-uppercase small text-muted">Type</div>
             <div class="fw-semibold">{{ lesson.get_lesson_type_display }}</div>
@@ -75,7 +138,7 @@
         </div>
       </div>
       <div class="col-md-3">
-        <div class="card brand-card shadow-sm border-0 h-100">
+        <div class="card brand-card shadow-sm border-0 h-100 training-stat">
           <div class="card-body">
             <div class="text-uppercase small text-muted">Durée</div>
             <div class="fw-semibold">{{ lesson.duration_minutes }} min</div>
@@ -83,7 +146,7 @@
         </div>
       </div>
       <div class="col-md-3">
-        <div class="card brand-card shadow-sm border-0 h-100">
+        <div class="card brand-card shadow-sm border-0 h-100 training-stat">
           <div class="card-body">
             <div class="text-uppercase small text-muted">Mode</div>
             <div class="fw-semibold">{{ completion_status.mode_label }}</div>
@@ -91,7 +154,7 @@
         </div>
       </div>
       <div class="col-md-3">
-        <div class="card brand-card shadow-sm border-0 h-100">
+        <div class="card brand-card shadow-sm border-0 h-100 training-stat">
           <div class="card-body">
             <div class="text-uppercase small text-muted">Score requis</div>
             <div class="fw-semibold">{{ lesson.passing_score }}%</div>
@@ -100,7 +163,7 @@
       </div>
     </div>
 
-<div class="card brand-card mb-4 shadow-sm border-0 training-section-card training-section" id="lessonContent">
+<div class="card brand-card mb-4 shadow-sm border-0 training-section-card training-section training-card--content" id="lessonContent">
   <div class="card-header bg-transparent d-flex align-items-center justify-content-between">
     <h5 class="card-title mb-0">Contenu du module</h5>
     <button class="btn btn-sm btn-secondary-premium" type="button" data-bs-toggle="collapse" data-bs-target="#lessonContentBody">
@@ -132,7 +195,7 @@
   </div>
 </div>
 
-<div class="card brand-card mb-4 shadow-sm border-0 training-section-card training-section" id="lessonSupports">
+<div class="card brand-card mb-4 shadow-sm border-0 training-section-card training-section training-card--supports" id="lessonSupports">
   <div class="card-header bg-transparent d-flex flex-wrap align-items-center justify-content-between gap-2">
     <h5 class="card-title mb-0">📘 Supports d’étude</h5>
     <div class="d-flex align-items-center gap-2">
@@ -186,7 +249,7 @@
 </div>
 
 {% if concept_cards %}
-<div class="card brand-card mb-4 shadow-sm border-0 training-section-card training-section" id="lessonLexique">
+<div class="card brand-card mb-4 shadow-sm border-0 training-section-card training-section training-card--lexique" id="lessonLexique">
   <div class="card-header bg-transparent d-flex align-items-center justify-content-between">
     <h5 class="card-title mb-0">Lexique & cartes de clarification</h5>
     <button class="btn btn-sm btn-secondary-premium" type="button" data-bs-toggle="collapse" data-bs-target="#lessonLexiqueBody">
@@ -216,7 +279,7 @@
 </div>
 {% endif %}
 
-<div class="card brand-card mb-4 shadow-sm border-0 training-section-card training-section" id="lessonStatus">
+<div class="card brand-card mb-4 shadow-sm border-0 training-section-card training-section training-card--status" id="lessonStatus">
   <div class="card-body">
     <h5 class="card-title">Statut du module</h5>
     <div class="small text-muted">Mode : {{ completion_status.mode_label }}</div>
@@ -237,7 +300,7 @@
 
 <div class="row g-4">
   <div class="col-lg-6">
-    <div class="card brand-card h-100 shadow-sm border-0 training-section-card training-section" id="lessonResources">
+    <div class="card brand-card h-100 shadow-sm border-0 training-section-card training-section training-card--resources" id="lessonResources">
       <div class="card-header bg-transparent d-flex align-items-center justify-content-between">
         <h5 class="card-title mb-0">Ressources</h5>
         <button class="btn btn-sm btn-secondary-premium" type="button" data-bs-toggle="collapse" data-bs-target="#lessonResourcesBody">
@@ -267,7 +330,7 @@
     </div>
   </div>
   <div class="col-lg-6">
-    <div class="card brand-card h-100 shadow-sm border-0 training-section-card training-section" id="lessonChecklist">
+    <div class="card brand-card h-100 shadow-sm border-0 training-section-card training-section training-card--checklist" id="lessonChecklist">
       <div class="card-header bg-transparent d-flex align-items-center justify-content-between">
         <h5 class="card-title mb-0">Checklist de mise en oeuvre</h5>
         <button class="btn btn-sm btn-secondary-premium" type="button" data-bs-toggle="collapse" data-bs-target="#lessonChecklistBody">
@@ -338,7 +401,7 @@
     </ul>
   </div>
   {% endif %}
-<div class="card brand-card mt-4 shadow-sm border-0 training-section-card training-section" id="lessonQuiz">
+<div class="card brand-card mt-4 shadow-sm border-0 training-section-card training-section training-card--quiz" id="lessonQuiz">
   <div class="card-header bg-transparent d-flex flex-wrap justify-content-between align-items-center gap-2">
     <div class="d-flex align-items-center gap-2">
       <h5 class="card-title mb-0">Quiz du module</h5>
